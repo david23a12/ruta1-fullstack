@@ -1,0 +1,20 @@
+=== DÍA 1 - NOTAS JAVASCRIPT MODERNO (javascript.info) ===
+
+1. let vs const:
+   - let: permite reasignar (let edad = 25; edad = 26;)
+   - const: NO permite reasignar (const PI = 3.14;)
+
+2. Arrow functions:
+   - Sintaxis corta: const suma = (a, b) => a + b;
+   - No tiene su propio 'this'
+
+3. Destructuring:
+   - const {nombre, edad} = usuario;
+   - const [primero, segundo] = array;
+
+4. Spread operator:
+   - Copiar array: const copia = [...original];
+   - Unir objetos: const nuevo = {...obj1, ...obj2};
+
+5. Template literals:
+   - `Hola ${nombre}, tienes ${edad} años`
