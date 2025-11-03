@@ -5,7 +5,7 @@ export default function TodoList() {
   const [tasks, setTasks] = useState([])
   const [newTask, setNewTask] = useState('')
   
-  const API = 'http://localhost:8000'
+  const API = 'https://ruta1-fullstack.onrender.com'  // TU URL EXACTA
 
   // CARGAR TAREAS AL INICIAR
   useEffect(() => {
