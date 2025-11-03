@@ -12,7 +12,7 @@
 | 1 | JS Moderno + Git + GitHub | [Repo](https://github.com/david23a12/ruta1-fullstack) |
 | 2 | React + Vite + Contador | [Web](https://ruta1-fullstack.vercel.app) |
 | 3 | ToDo List con estado local | [Web](https://ruta1-fullstack.vercel.app) |
-| 4 | Backend FastAPI + API | `En progreso` |
+| 4 | Backend FastAPI + Persistencia JSON | Local: http://localhost:8000/docs |
 | ... | Full Stack + DB | `Próximamente` |
 
 ---
