@@ -10,7 +10,7 @@ app = FastAPI(title="ToDo API - David Día 4")
 # CORS: Permitir React
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Cambiar a tu Vercel URL después
+    allow_origins=["https://ruta1-fullstack.vercel.app", "http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
