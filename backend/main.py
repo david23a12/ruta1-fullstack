@@ -1,13 +1,13 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import json
+from sqlalchemy import create_engine, Column, Integer, String, Boolean, text
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 import os
-from typing import List
 
-app = FastAPI(title="ToDo API - David Día 4")
+app = FastAPI(title="ToDo API SQL - Día 6")
 
-# CORS: Permitir React
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["https://ruta1-fullstack.vercel.app", "http://localhost:5173"],
@@ -16,54 +16,68 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# DB SETUP
+DATABASE_URL = "sqlite:///./tasks.db"
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
+
+class TaskDB(Base):
+    __tablename__ = "tasks"
+    id = Column(Integer, primary_key=True, index=True)
+    text = Column(String, index=True)
+    completed = Column(Boolean, default=False)
+
+# CREAR TABLA SI NO EXISTE
+Base.metadata.create_all(bind=engine)
+
 class Task(BaseModel):
-    id: int
+    id: int | None = None
     text: str
     completed: bool = False
 
-TASKS_FILE = "tasks.json"
-
-def load_tasks() -> List[Task]:
-    if os.path.exists(TASKS_FILE):
-        with open(TASKS_FILE, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            return [Task(**t) for t in data]
-    return []
-
-def save_tasks(tasks: List[Task]):
-    with open(TASKS_FILE, "w", encoding="utf-8") as f:
-        json.dump([t.dict() for t in tasks], f, indent=2)
-
 @app.get("/")
 def home():
-    return {"message": "API ToDo Full Stack - Día 4"}
+    return {"message": "API ToDo SQL - Día 6"}
 
 @app.get("/tasks")
 def get_tasks():
-    return load_tasks()
+    db = SessionLocal()
+    tasks = db.query(TaskDB).all()
+    db.close()
+    return [{"id": t.id, "text": t.text, "completed": t.completed} for t in tasks]
 
 @app.post("/tasks")
 def add_task(task: Task):
-    tasks = load_tasks()
-    tasks.append(task)
-    save_tasks(tasks)
-    return task
+    db = SessionLocal()
+    db_task = TaskDB(text=task.text, completed=task.completed)
+    db.add(db_task)
+    db.commit()
+    db.refresh(db_task)
+    db.close()
+    return {"id": db_task.id, "text": db_task.text, "completed": db_task.completed}
 
 @app.put("/tasks/{task_id}")
 def update_task(task_id: int, task: Task):
-    tasks = load_tasks()
-    for i, t in enumerate(tasks):
-        if t.id == task_id:
-            tasks[i] = task
-            save_tasks(tasks)
-            return task
-    raise HTTPException(404, "Tarea no encontrada")
+    db = SessionLocal()
+    db_task = db.query(TaskDB).filter(TaskDB.id == task_id).first()
+    if not db_task:
+        db.close()
+        raise HTTPException(404, "Tarea no encontrada")
+    db_task.text = task.text
+    db_task.completed = task.completed
+    db.commit()
+    db.close()
+    return {"id": db_task.id, "text": db_task.text, "completed": db_task.completed}
 
 @app.delete("/tasks/{task_id}")
 def delete_task(task_id: int):
-    tasks = load_tasks()
-    new_tasks = [t for t in tasks if t.id != task_id]
-    if len(new_tasks) == len(tasks):
+    db = SessionLocal()
+    db_task = db.query(TaskDB).filter(TaskDB.id == task_id).first()
+    if not db_task:
+        db.close()
         raise HTTPException(404, "Tarea no encontrada")
-    save_tasks(new_tasks)
+    db.delete(db_task)
+    db.commit()
+    db.close()
     return {"success": True}
