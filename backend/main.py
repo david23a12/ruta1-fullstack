@@ -36,13 +36,13 @@ Base = declarative_base()
 
 class User(Base):
     __tablename__ = "users"
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     username = Column(String, unique=True, index=True)
     hashed_password = Column(String)
 
 class TaskDB(Base):
     __tablename__ = "tasks"
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     text = Column(String)
     completed = Column(Boolean, default=False)
     user_id = Column(Integer)
