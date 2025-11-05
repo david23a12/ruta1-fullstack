@@ -1,3 +1,67 @@
+/* LOGIN */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.login-box {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+  width: 350px;
+  text-align: center;
+}
+
+.login-box h2 {
+  margin-bottom: 1.5rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.login-box input {
+  width: 100%;
+  padding: 0.8rem;
+  margin: 0.5rem 0;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border 0.3s;
+}
+
+.login-box input:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.login-box button {
+  width: 100%;
+  padding: 0.9rem;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: background 0.3s;
+}
+
+.login-box button:hover {
+  background: #5a6fd8;
+}
+
+.error {
+  color: #e74c3c;
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+}
+
+/* APP */
 .todo-container {
   max-width: 500px;
   margin: 2rem auto;
@@ -5,7 +69,29 @@
   background: white;
   border-radius: 16px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-  text-align: center;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.header h2 {
+  margin: 0;
+  color: #333;
+}
+
+.logout {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
 }
 
 .input-group {
@@ -20,6 +106,12 @@
   font-size: 1rem;
   border: 2px solid #ddd;
   border-radius: 8px;
+  transition: border 0.3s;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: #667eea;
 }
 
 .input-group button {
@@ -30,10 +122,17 @@
   border-radius: 8px;
   cursor: pointer;
   font-weight: bold;
+  transition: background 0.3s;
+}
+
+.input-group button:hover {
+  background: #5a6fd8;
 }
 
 .task-list {
   list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .task-list li {
@@ -42,11 +141,17 @@
   padding: 0.8rem;
   border-bottom: 1px solid #eee;
   gap: 0.5rem;
+  transition: background 0.2s;
+}
+
+.task-list li:hover {
+  background: #f8f9ff;
 }
 
 .task-list li.completed span {
   text-decoration: line-through;
   opacity: 0.6;
+  color: #666;
 }
 
 .delete {
@@ -55,9 +160,10 @@
   border: none;
   cursor: pointer;
   font-size: 1.2rem;
+  color: #e74c3c;
+  transition: color 0.3s;
 }
 
-footer {
-  margin-top: 2rem;
-  color: #666;
+.delete:hover {
+  color: #c0392b;
 }
