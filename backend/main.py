@@ -6,11 +6,11 @@ from sqlalchemy import create_engine, Column, Integer, String, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from jose import JWTError, jwt
-from passlib.context import CryptContext
+from argon2 import PasswordHasher
 from datetime import datetime, timedelta
 import os
 
-app = FastAPI(title="ToDo API JWT - Día 7")
+app = FastAPI(title="ToDo API JWT - Día 7 (Argon2)")
 
 app.add_middleware(
     CORSMiddleware,
@@ -25,7 +25,7 @@ SECRET_KEY = "cambia_esta_clave_secreta_muy_larga_1234567890"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+ph = PasswordHasher()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 # === DB SETUP ===
@@ -36,16 +36,17 @@ Base = declarative_base()
 
 class User(Base):
     __tablename__ = "users"
-    id = Column(Integer, primary_key=True)  # SIN index=True NI autoincrement
+    id = Column(Integer, primary_key=True)
     username = Column(String, unique=True)
     hashed_password = Column(String)
 
 class TaskDB(Base):
     __tablename__ = "tasks"
-    id = Column(Integer, primary_key=True)  # SIN index=True NI autoincrement
+    id = Column(Integer, primary_key=True)
     text = Column(String)
     completed = Column(Boolean, default=False)
     user_id = Column(Integer)
+
 Base.metadata.create_all(bind=engine)
 
 # === MODELS ===
@@ -63,11 +64,15 @@ class Task(BaseModel):
     completed: bool = False
 
 # === HELPERS ===
-def verify_password(plain, hashed):
-    return pwd_context.verify(plain, hashed)
+def hash_password(password: str) -> str:
+    return ph.hash(password)
 
-def get_password_hash(password):
-    return pwd_context.hash(password)
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    try:
+        ph.verify(hashed_password, plain_password)
+        return True
+    except:
+        return False
 
 def create_access_token(data: dict):
     to_encode = data.copy()
@@ -99,11 +104,10 @@ def register(user: UserIn):
     if db_user:
         db.close()
         raise HTTPException(400, "Usuario ya existe")
-    hashed = get_password_hash(user.password)
+    hashed = hash_password(user.password)
     new_user = User(username=user.username, hashed_password=hashed)
     db.add(new_user)
     db.commit()
-    # QUITA db.refresh(new_user) ← ESTO CAUSA EL 500 EN RENDER
     db.close()
     return {"message": "Usuario creado"}
 
@@ -117,7 +121,6 @@ def login(form: OAuth2PasswordRequestForm = Depends()):
     token = create_access_token({"sub": user.username})
     return {"access_token": token, "token_type": "bearer"}
 
-# === TAREAS PROTEGIDAS ===
 @app.get("/tasks")
 def get_tasks(current_user: str = Depends(get_current_user)):
     db = SessionLocal()
@@ -133,7 +136,6 @@ def add_task(task: Task, current_user: str = Depends(get_current_user)):
     db_task = TaskDB(text=task.text, completed=task.completed, user_id=user_id)
     db.add(db_task)
     db.commit()
-    db.refresh(db_task)
     db.close()
     return {"id": db_task.id, "text": db_task.text, "completed": db_task.completed}
 
