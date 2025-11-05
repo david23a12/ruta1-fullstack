@@ -136,6 +136,7 @@ def add_task(task: Task, current_user: str = Depends(get_current_user)):
     db_task = TaskDB(text=task.text, completed=task.completed, user_id=user_id)
     db.add(db_task)
     db.commit()
+    db.refresh(db_task)  # ← ESTO ES CLAVE
     db.close()
     return {"id": db_task.id, "text": db_task.text, "completed": db_task.completed}
 
