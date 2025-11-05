@@ -36,17 +36,16 @@ Base = declarative_base()
 
 class User(Base):
     __tablename__ = "users"
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    username = Column(String, unique=True, index=True)
+    id = Column(Integer, primary_key=True)  # SIN index=True NI autoincrement
+    username = Column(String, unique=True)
     hashed_password = Column(String)
 
 class TaskDB(Base):
     __tablename__ = "tasks"
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    id = Column(Integer, primary_key=True)  # SIN index=True NI autoincrement
     text = Column(String)
     completed = Column(Boolean, default=False)
     user_id = Column(Integer)
-
 Base.metadata.create_all(bind=engine)
 
 # === MODELS ===
@@ -104,9 +103,9 @@ def register(user: UserIn):
     new_user = User(username=user.username, hashed_password=hashed)
     db.add(new_user)
     db.commit()
-    db.refresh(new_user)  # ← ESTO ES CLAVE
+    # QUITA db.refresh(new_user) ← ESTO CAUSA EL 500 EN RENDER
     db.close()
-    return {"message": "Usuario creado", "id": new_user.id}
+    return {"message": "Usuario creado"}
 
 @app.post("/login", response_model=Token)
 def login(form: OAuth2PasswordRequestForm = Depends()):
