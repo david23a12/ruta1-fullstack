@@ -104,9 +104,9 @@ def register(user: UserIn):
     new_user = User(username=user.username, hashed_password=hashed)
     db.add(new_user)
     db.commit()
-    db.refresh(new_user)
+    db.refresh(new_user)  # ← ESTO ES CLAVE
     db.close()
-    return {"message": "Usuario creado"}
+    return {"message": "Usuario creado", "id": new_user.id}
 
 @app.post("/login", response_model=Token)
 def login(form: OAuth2PasswordRequestForm = Depends()):
